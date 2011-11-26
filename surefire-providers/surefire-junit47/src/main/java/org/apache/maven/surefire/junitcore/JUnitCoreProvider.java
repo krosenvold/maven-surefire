@@ -25,6 +25,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.maven.surefire.common.junit4.JUnit4RunListener;
 import org.apache.maven.surefire.common.junit4.JUnit4RunListenerFactory;
 import org.apache.maven.surefire.common.junit4.JUnit4TestChecker;
 import org.apache.maven.surefire.common.junit48.FilterFactory;
@@ -126,14 +128,17 @@ public class JUnitCoreProvider
 
         final Map<String, TestSet> testSetMap = new ConcurrentHashMap<String, TestSet>();
 
-        RunListener listener = ConcurrentReporterManager.createInstance( testSetMap, reporterFactory,
+        RunListener listener = jUnitCoreParameters.isNoThreading() ?
+               reporterFactory.createReporter()  :
+            ConcurrentReporterManager.createInstance( testSetMap, reporterFactory,
                                                                          jUnitCoreParameters.isParallelClasses(),
                                                                          jUnitCoreParameters.isParallelBoth(),
                                                                          consoleLogger );
-
         ConsoleOutputCapture.startCapture( (ConsoleOutputReceiver) listener );
 
-        org.junit.runner.notification.RunListener jUnit4RunListener = new JUnitCoreRunListener( listener, testSetMap );
+        org.junit.runner.notification.RunListener jUnit4RunListener = jUnitCoreParameters.isNoThreading() ?
+            new JUnit4RunListener( listener ) :
+            new JUnitCoreRunListener( listener, testSetMap );
         customRunListeners.add( 0, jUnit4RunListener );
 
         JUnitCoreWrapper.execute( testsToRun, jUnitCoreParameters, customRunListeners, filter );
