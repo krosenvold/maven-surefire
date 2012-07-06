@@ -50,6 +50,7 @@ public class ForkedBooter
         throws Throwable
     {
         final PrintStream originalOut = System.out;
+        preload();
         try
         {
             if ( args.length > 1 )
@@ -72,7 +73,7 @@ public class ForkedBooter
             startupConfiguration.writeSurefireTestClasspathProperty();
 
             Object testSet = forkedTestSet != null ? forkedTestSet.getDecodedValue( testClassLoader ) : null;
-            runSuitesInProcess( testSet, testClassLoader, startupConfiguration, providerConfiguration, originalOut );
+            runSuitesInProcess( testSet, testClassLoader, startupConfiguration, providerConfiguration );
             // Say bye.
             originalOut.println( "Z,0,BYE!" );
             originalOut.flush();
@@ -97,11 +98,47 @@ public class ForkedBooter
         System.exit( returnCode );
     }
 
+    private static void preload()
+    {
+        new Thread(new Runnable(){
+            public void run()
+            {
+                ClassLoader classLoader = this.getClass().getClassLoader();
+                try
+                {
+                    classLoader.loadClass( "org.apache.maven.surefire.shade.org.codehaus.plexus.util.DirectoryScanner");
+                    classLoader.loadClass( org.apache.maven.surefire.report.ConsoleOutputCapture.class.getName() );
+                    classLoader.loadClass(  org.apache.maven.surefire.testset.DirectoryScannerParameters.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.report.ReporterConfiguration.class.getName());
+                    classLoader.loadClass( org.apache.maven.surefire.report.ReporterFactory.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.report.ReporterFactory .class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.booter.ClassLoaderConfiguration.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.booter.ClasspathConfiguration.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.booter.IsolatedClassLoader.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.util.NestedCheckedException.class.getName());
+                    classLoader.loadClass( org.apache.maven.surefire.booter.JdkReflector.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.booter.SurefireReflector.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.booter.ForkingReporterFactory.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.report.RunListener.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.booter.ProviderFactory.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.providerapi.SurefireProvider.class.getName() );
+                    classLoader.loadClass(  org.apache.maven.surefire.booter.BaseProviderFactory.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.report.ReporterFactory .class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.report.ReportEntry.class.getName() );
+                    classLoader.loadClass( org.apache.maven.surefire.util.DefaultRunOrderCalculator.class.getName() );
 
-    private static RunResult runSuitesInProcess( Object testSet, ClassLoader testsClassLoader,
+                }
+                catch ( ClassNotFoundException e )
+                {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        }).start();
+    }
+
+    public static RunResult runSuitesInProcess( Object testSet, ClassLoader testsClassLoader,
                                                 StartupConfiguration startupConfiguration,
-                                                ProviderConfiguration providerConfiguration,
-                                                PrintStream originalSystemOut )
+                                                ProviderConfiguration providerConfiguration )
         throws SurefireExecutionException
     {
         final ClasspathConfiguration classpathConfiguration = startupConfiguration.getClasspathConfiguration();
@@ -109,18 +146,17 @@ public class ForkedBooter
 
         SurefireReflector surefireReflector = new SurefireReflector( surefireClassLoader );
 
-        final Object factory =
-            createForkingReporterFactory( surefireReflector, providerConfiguration, originalSystemOut );
+        final Object factory = createForkingReporterFactory( surefireReflector, providerConfiguration );
 
         return ProviderFactory.invokeProvider( testSet, testsClassLoader, surefireClassLoader, factory,
                                                providerConfiguration, true, startupConfiguration, false );
     }
 
     private static Object createForkingReporterFactory( SurefireReflector surefireReflector,
-                                                        ProviderConfiguration providerConfiguration,
-                                                        PrintStream originalSystemOut )
+                                                        ProviderConfiguration providerConfiguration )
     {
         final Boolean trimStackTrace = providerConfiguration.getReporterConfiguration().isTrimStackTrace();
+        final PrintStream originalSystemOut = providerConfiguration.getReporterConfiguration().getOriginalSystemOut();
         return surefireReflector.createForkingReporterFactory( trimStackTrace, originalSystemOut );
     }
 
