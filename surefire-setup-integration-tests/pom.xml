@@ -30,6 +30,8 @@
 
   <groupId>org.apache.maven.surefire</groupId>
   <artifactId>surefire-setup-integration-tests</artifactId>
+  <packaging>maven-plugin</packaging>
+
 
   <name>Maven Surefire Integration Test Setup</name>
 
@@ -47,6 +49,11 @@
       <groupId>org.apache.maven.plugins</groupId>
       <version>${project.version}</version>
       <type>maven-plugin</type>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <artifactId>maven-surefire-report-plugin</artifactId>
@@ -72,6 +79,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>3.0.4</version>
+    </dependency>
+
     <dependency>
       <groupId>org.apache.maven.surefire</groupId>
       <artifactId>surefire-junit3</artifactId>
@@ -101,7 +114,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>net.sourceforge.htmlunit</groupId>
@@ -117,7 +129,27 @@
   </dependencies>
 
   <build>
+
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>${mavenPluginPluginVersion}</version>
+        <configuration>
+          <goalPrefix>resolve</goalPrefix>
+          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+        </configuration>
+        <executions>
+          <execution>
+            <id>mojo-descriptor</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <artifactId>maven-help-plugin</artifactId>
         <version>2.1</version>
