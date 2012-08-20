@@ -19,15 +19,6 @@ package org.apache.maven.plugin.surefire.booterclient;
  * under the License.
  */
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 import org.apache.maven.plugin.surefire.util.Relocator;
 import org.apache.maven.surefire.booter.ClassLoaderConfiguration;
 import org.apache.maven.surefire.booter.Classpath;
@@ -36,6 +27,17 @@ import org.apache.maven.surefire.booter.SurefireBooterForkException;
 import org.apache.maven.surefire.util.UrlUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.Commandline;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
+import java.util.jar.Manifest;
 
 /**
  * Configuration for forking tests.
@@ -56,7 +58,7 @@ public class ForkConfiguration
 
     private final int forkCount;
 
-    private final Classpath bootClasspathConfiguration;
+    private final Future<Classpath> bootClasspathConfiguration;
 
     private final String jvmExecutable;
 
@@ -72,7 +74,7 @@ public class ForkConfiguration
 
     private final String debugLine;
 
-    public ForkConfiguration( Classpath bootClasspathConfiguration, File tmpDir, String debugLine, String jvmExecutable,
+    public ForkConfiguration( Future<Classpath> bootClasspathConfiguration, File tmpDir, String debugLine, String jvmExecutable,
                               File workingDirectory, String argLine, Map<String, String> environmentVariables,
                               boolean debugEnabled, int forkCount )
     {
@@ -87,9 +89,14 @@ public class ForkConfiguration
         this.forkCount = forkCount;
     }
 
-    public Classpath getBootClasspath()
-    {
-        return bootClasspathConfiguration;
+    public Classpath getBootClasspath() throws SurefireBooterForkException {
+        try {
+            return bootClasspathConfiguration.get();
+        } catch (InterruptedException e) {
+            throw new  SurefireBooterForkException("Interrupted in asynch artifact resolution", e);
+        } catch (ExecutionException e) {
+            throw new  SurefireBooterForkException("ExecutedExecption in asynch artifact resolution", e);
+        }
     }
 
     public static String getEffectiveForkMode(String forkMode)

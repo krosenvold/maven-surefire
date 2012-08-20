@@ -19,6 +19,7 @@ package org.apache.maven.plugin.surefire;
  * under the License.
  */
 
+import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -81,6 +82,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 /**
  * Abstract base class for running tests using Surefire.
@@ -1237,10 +1241,10 @@ public abstract class AbstractSurefireMojo
                                                                 RunOrderParameters runOrderParameters )
         throws MojoExecutionException, MojoFailureException
     {
-        StartupConfiguration startupConfiguration = createStartupConfiguration( provider, classLoaderConfiguration );
+        StartupConfiguration startupConfiguration = createStartupConfiguration(provider, classLoaderConfiguration);
         String configChecksum = getConfigChecksum();
         StartupReportConfiguration startupReportConfiguration = getStartupReportConfiguration( configChecksum );
-        ProviderConfiguration providerConfiguration = createProviderConfiguration( runOrderParameters );
+        ProviderConfiguration providerConfiguration = createProviderConfiguration(runOrderParameters);
         return new InPluginVMSurefireStarter( startupConfiguration, providerConfiguration, startupReportConfiguration );
 
     }
@@ -1253,7 +1257,7 @@ public abstract class AbstractSurefireMojo
 
         Artifact shadeFire = getPluginArtifactMap().get( "org.apache.maven.surefire:surefire-shadefire" );
 
-        final Classpath bootClasspathConfiguration =
+        final Future<Classpath> bootClasspathConfiguration =
             getArtifactClasspath( shadeFire != null ? shadeFire : surefireBooterArtifact );
 
         return new ForkConfiguration( bootClasspathConfiguration, tmpDir, getEffectiveDebugForkedProcess(),
@@ -1561,28 +1565,34 @@ public abstract class AbstractSurefireMojo
         }
     }
 
-    private Classpath getArtifactClasspath( Artifact surefireArtifact )
+    private Future<Classpath> getArtifactClasspath( final Artifact surefireArtifact )
     {
         Classpath existing = ClasspathCache.getCachedClassPath( surefireArtifact.getArtifactId() );
-        if ( existing == null )
-        {
-            ArtifactResolutionResult result = resolveArtifact( null, surefireArtifact );
-
-            List<String> items = new ArrayList<String>();
-            for ( Object o : result.getArtifacts() )
-            {
-                Artifact artifact = (Artifact) o;
-
-                getLog().debug(
-                    "Adding to " + getPluginName() + " booter test classpath: " + artifact.getFile().getAbsolutePath() +
-                        " Scope: " + artifact.getScope() );
-
-                items.add( artifact.getFile().getAbsolutePath() );
-            }
-            existing = new Classpath( items );
-            ClasspathCache.setCachedClasspath( surefireArtifact.getArtifactId(), existing );
+        if (existing != null){
+            return ConcurrentUtils.constantFuture(existing);
         }
-        return existing;
+        FutureTask<Classpath> classpathFutureTask = new FutureTask<Classpath>(new Callable<Classpath>(){
+            public Classpath call() throws Exception {
+                ArtifactResolutionResult result = resolveArtifact( null, surefireArtifact );
+
+                List<String> items = new ArrayList<String>();
+                for ( Object o : result.getArtifacts() )
+                {
+                    Artifact artifact = (Artifact) o;
+
+                    getLog().debug(
+                            "Adding to " + getPluginName() + " booter test classpath: " + artifact.getFile().getAbsolutePath() +
+                                    " Scope: " + artifact.getScope() );
+
+                    items.add( artifact.getFile().getAbsolutePath() );
+                }
+                Classpath resolved = new Classpath( items );
+                ClasspathCache.setCachedClasspath(surefireArtifact.getArtifactId(), resolved);
+                return resolved;
+            }
+        });
+        new Thread( classpathFutureTask).start();
+        return classpathFutureTask;
     }
 
     private Properties getUserProperties()
