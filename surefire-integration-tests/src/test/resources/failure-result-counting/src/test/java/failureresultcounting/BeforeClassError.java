@@ -19,23 +19,21 @@ package failureresultcounting;
  */
 
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * @author Kristian Rosenvold
  */
 public class BeforeClassError
+    extends TestCase
 {
 
-    @BeforeClass
     public static void beforeClassError()
     {
         throw new RuntimeException( "Exception in beforeclass" );
     }
 
-    @Test
-    public void ok()
+    public void testOk()
     {
         System.out.println( "beforeClassError run !!" );
     }

@@ -19,15 +19,28 @@ package failureresultcounting;
  * under the License.
  */
 
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+
 public class RunTests
 {
     public static void main(String args[]) {
-        org.junit.runner.JUnitCore.main(BeforeClassError.class.getName(),
-                                        BeforeClassFailure.class.getName(),
-                                        BeforeError.class.getName(),
-                                        BeforeFailure.class.getName(),
-                                        OrdinaryError.class.getName(),
-                                        NoErrors.class.getName()
-                                        );
+        TestSuite testSuite = new TestSuite(  );
+        testSuite.addTest(  new BeforeClassError() );
+        testSuite.addTest( new BeforeClassFailure() );
+        testSuite.addTest( new BeforeError() );
+        testSuite.addTest( new BeforeFailure() );
+        testSuite.addTest( new OrdinaryError() );
+        testSuite.addTest( new NoErrors() );
+        TestResult testResult = new TestResult();
+        testSuite.run(  testResult);
+        System.out.println(testResult );
+        /*     org.junit.runner.JUnitCore.main(BeforeClassError.class.getName(),
+        BeforeClassFailure.class.getName(),
+        BeforeError.class.getName(),
+        BeforeFailure.class.getName(),
+        OrdinaryError.class.getName(),
+        NoErrors.class.getName()
+        );*/
     }
 }

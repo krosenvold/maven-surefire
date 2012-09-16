@@ -55,7 +55,7 @@ public class FileReporterTest
 
     private TestSetStats createTestSetStats()
     {
-        return new TestSetStats( true, true );
+        return new TestSetStats( true, true, true );
     }
 
     public void testFileNameWithSuffix()

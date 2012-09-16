@@ -19,25 +19,22 @@ package failureresultcounting;
  */
 
 import junit.framework.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import junit.framework.TestCase;
 
 /**
  * @author Kristian Rosenvold
  */
 public class BeforeClassFailure
+    extends TestCase
 {
 
-    @BeforeClass
     public static void failInBeforeClass()
     {
         Assert.fail( "Failing in @BeforeClass" );
     }
 
-    @Test
-    public void ok()
+    public void testOk()
     {
-        System.out.println( "failInBeforeClass run !!");
     }
 
 }

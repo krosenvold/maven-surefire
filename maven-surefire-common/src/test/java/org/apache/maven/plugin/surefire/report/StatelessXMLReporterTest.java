@@ -24,7 +24,6 @@ import java.io.File;
 import org.apache.maven.surefire.report.PojoStackTraceWriter;
 import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.SimpleReportEntry;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
@@ -48,7 +47,7 @@ public class StatelessXMLReporterTest
         message = "junit.framework.AssertionFailedError";
         reportEntry = new SimpleReportEntry( this.getClass().getName(), "StatelessXMLReporterTest",
                                              new PojoStackTraceWriter( "", "", new AssertionFailedError() ), 17 );
-        stats = new TestSetStats( false, true );
+        stats = new TestSetStats( false, true, true );
     }
 
     public void testFileNameWithoutSuffix()

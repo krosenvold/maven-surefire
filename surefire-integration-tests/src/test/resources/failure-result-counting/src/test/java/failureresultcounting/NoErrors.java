@@ -18,25 +18,20 @@ package failureresultcounting;
  * under the License.
  */
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import junit.framework.TestCase;
+
 
 /**
  * @author Kristian Rosenvold
  */
-public class NoErrors
+public class NoErrors extends TestCase
 {
 
-    @Test
-    @Ignore
-    public void allOk1()
+    public void testAllOk1()
     {
     }
 
-    @Test
-    @Ignore
-    public void allOk2()
+    public void testAllOk2()
     {
     }
 

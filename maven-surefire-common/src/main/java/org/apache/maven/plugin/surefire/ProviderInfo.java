@@ -36,4 +36,6 @@ public interface ProviderInfo
         throws ArtifactResolutionException, ArtifactNotFoundException;
 
     void addProviderProperties();
+
+    boolean isJUnit4StyleResultCounting();
 }

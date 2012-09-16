@@ -18,24 +18,24 @@ package failureresultcounting;
  * under the License.
  */
 
-import org.junit.Assert;
-import org.junit.Test;
+import junit.framework.Assert;
+import junit.framework.TestCase;
+
 
 /**
  * @author Kristian Rosenvold
  */
-public class OrdinaryError
+public class OrdinaryError extends TestCase
 {
 
-    @Test
-    public void ordinaryEror()
+    public void testOrdinaryEror()
     {
         throw new RuntimeException( "Exception in @before" );
     }
 
-    @Test
-    public void ordinaryFailure()
+    public void testOrdinaryFailure()
     {
+
         Assert.fail();
     }
 

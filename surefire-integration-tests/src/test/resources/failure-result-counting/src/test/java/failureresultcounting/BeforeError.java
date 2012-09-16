@@ -18,31 +18,23 @@ package failureresultcounting;
  * under the License.
  */
 
-import org.junit.Before;
-import org.junit.Test;
+import junit.framework.TestCase;
+
 
 /**
  * @author Kristian Rosenvold
  */
-public class BeforeError
+public class BeforeError extends TestCase
 {
 
-    @Before
-    public void exceptionInBefore()
+   public void setUp()
     {
         throw new RuntimeException( "Exception in @before" );
     }
 
-    @Test
-    public void ok()
+    public void testOk()
     {
         System.out.println( "exceptionInBefore run!!");
     }
-
-    /*@Test
-    public void ok2()
-    {
-        System.out.println( "exceptionInBefore2 run!!");
-    } */
 
 }

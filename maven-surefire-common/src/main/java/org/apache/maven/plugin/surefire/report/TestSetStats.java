@@ -48,12 +48,15 @@ public class TestSetStats
 
     private long elapsedForTestSet;
 
+    private final boolean junit4styleCounting;
+
     private final List<WrappedReportEntry> reportEntries = new ArrayList<WrappedReportEntry>();
 
-    public TestSetStats( boolean trimStackTrace, boolean plainFormat )
+    public TestSetStats( boolean trimStackTrace, boolean plainFormat, boolean jUnit4StyleResultCounting )
     {
         this.trimStackTrace = trimStackTrace;
         this.plainFormat = plainFormat;
+        this.junit4styleCounting = jUnit4StyleResultCounting;
     }
 
     public int getElapsedSinceTestSetStart()
@@ -76,10 +79,13 @@ public class TestSetStats
         lastStartAt = testStartAt = System.currentTimeMillis();
     }
 
-    private long finishTest( WrappedReportEntry reportEntry )
+    private long finishTest( WrappedReportEntry reportEntry, boolean succeeded )
     {
         reportEntries.add( reportEntry );
-        incrementCompletedCount();
+        if (junit4styleCounting || succeeded)
+        {
+            incrementCompletedCount();
+        }
         long testEndAt = System.currentTimeMillis();
         // SUREFIRE-398 skipped tests call endTest without calling testStarting
         // if startTime = 0, set it to endTime, so the diff will be 0
@@ -94,27 +100,27 @@ public class TestSetStats
 
     public void testSucceeded( WrappedReportEntry reportEntry )
     {
-        finishTest( reportEntry );
+        finishTest( reportEntry, true );
     }
 
 
     public void testError( WrappedReportEntry reportEntry )
     {
         errors += 1;
-        finishTest( reportEntry );
+        finishTest( reportEntry, false );
 
     }
 
     public void testFailure( WrappedReportEntry reportEntry )
     {
         failures += 1;
-        finishTest( reportEntry );
+        finishTest( reportEntry, false );
     }
 
     public void testSkipped( WrappedReportEntry reportEntry )
     {
         skipped += 1;
-        finishTest( reportEntry );
+        finishTest( reportEntry, true );
     }
 
     public void reset()

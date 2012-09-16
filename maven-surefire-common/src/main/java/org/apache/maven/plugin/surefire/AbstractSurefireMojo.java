@@ -1050,12 +1050,13 @@ public abstract class AbstractSurefireMojo
         return getPluginArtifactMap().get( "org.apache.maven.surefire:maven-surefire-common" );
     }
 
-    private StartupReportConfiguration getStartupReportConfiguration( String configChecksum )
+    private StartupReportConfiguration getStartupReportConfiguration( String configChecksum,
+                                                                      boolean jUnit4StyleResultCounting )
     {
         return new StartupReportConfiguration( isUseFile(), isPrintSummary(), getReportFormat(),
                                                isRedirectTestOutputToFile(), isDisableXmlReport(),
                                                getReportsDirectory(), isTrimStackTrace(), getReportNameSuffix(),
-                                               configChecksum, requiresRunHistory() );
+                                               configChecksum, requiresRunHistory(), jUnit4StyleResultCounting );
     }
 
     void logClasspath( Classpath classpath, String descriptor )
@@ -1226,7 +1227,8 @@ public abstract class AbstractSurefireMojo
     {
         StartupConfiguration startupConfiguration = createStartupConfiguration( provider, classLoaderConfiguration );
         String configChecksum = getConfigChecksum();
-        StartupReportConfiguration startupReportConfiguration = getStartupReportConfiguration( configChecksum );
+        StartupReportConfiguration startupReportConfiguration = getStartupReportConfiguration( configChecksum,
+                                                                                               provider.isJUnit4StyleResultCounting() );
         ProviderConfiguration providerConfiguration = createProviderConfiguration( runOrderParameters );
         return new ForkStarter( providerConfiguration, startupConfiguration, forkConfiguration,
                                 getForkedProcessTimeoutInSeconds(), startupReportConfiguration );
@@ -1239,7 +1241,7 @@ public abstract class AbstractSurefireMojo
     {
         StartupConfiguration startupConfiguration = createStartupConfiguration( provider, classLoaderConfiguration );
         String configChecksum = getConfigChecksum();
-        StartupReportConfiguration startupReportConfiguration = getStartupReportConfiguration( configChecksum );
+        StartupReportConfiguration startupReportConfiguration = getStartupReportConfiguration( configChecksum, provider.isJUnit4StyleResultCounting() );
         ProviderConfiguration providerConfiguration = createProviderConfiguration( runOrderParameters );
         return new InPluginVMSurefireStarter( startupConfiguration, providerConfiguration, startupReportConfiguration );
 
@@ -1717,6 +1719,11 @@ public abstract class AbstractSurefireMojo
             return dependencyResolver.getProviderClasspath( "surefire-testng", surefireArtifact.getBaseVersion(),
                                                             testNgArtifact );
         }
+
+        public boolean isJUnit4StyleResultCounting()
+        {
+            return false;
+        }
     }
 
     class JUnit3ProviderInfo
@@ -1746,6 +1753,10 @@ public abstract class AbstractSurefireMojo
 
         }
 
+        public boolean isJUnit4StyleResultCounting()
+        {
+            return false;
+        }
     }
 
     class JUnit4ProviderInfo
@@ -1782,6 +1793,12 @@ public abstract class AbstractSurefireMojo
                                                             null );
 
         }
+
+        public boolean isJUnit4StyleResultCounting()
+        {
+            return true;
+        }
+
 
     }
 
@@ -1828,6 +1845,12 @@ public abstract class AbstractSurefireMojo
                                                             null );
         }
 
+        public boolean isJUnit4StyleResultCounting()
+        {
+            return true;
+        }
+
+
     }
 
     public class DynamicProviderInfo
@@ -1870,6 +1893,12 @@ public abstract class AbstractSurefireMojo
             Artifact plugin = pluginArtifactMap.get( "org.apache.maven.plugins:maven-surefire-plugin" );
             return dependencyResolver.addProviderToClasspath( pluginArtifactMap, plugin );
         }
+
+        public boolean isJUnit4StyleResultCounting()
+        {
+            return false;
+        }
+
 
     }
 

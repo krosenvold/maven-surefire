@@ -68,7 +68,8 @@ public class DefaultReporterFactory
                                     reportConfiguration.instantiateConsoleOutputFileReporter(), statisticsReporter,
                                     globalStats, reportConfiguration.isTrimStackTrace(),
                                     ConsoleReporter.PLAIN.equals( reportConfiguration.getReportFormat() ),
-                                    reportConfiguration.isBriefOrPlainFormat() );
+                                    reportConfiguration.isBriefOrPlainFormat(),
+                                    reportConfiguration.isjUnit4StyleResultCounting());
         listeners.add( testSetRunListener );
         return testSetRunListener;
     }

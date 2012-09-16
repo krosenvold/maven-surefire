@@ -55,6 +55,8 @@ public class StartupReportConfiguration
 
     private final boolean requiresRunHistory;
 
+    private final boolean jUnit4StyleResultCounting;
+
     private final boolean redirectTestOutputToFile;
 
     private final boolean disableXmlReport;
@@ -72,7 +74,8 @@ public class StartupReportConfiguration
     public StartupReportConfiguration( boolean useFile, boolean printSummary, String reportFormat,
                                        boolean redirectTestOutputToFile, boolean disableXmlReport,
                                        File reportsDirectory, boolean trimStackTrace, String reportNameSuffix,
-                                       String configurationHash, boolean requiresRunHistory )
+                                       String configurationHash, boolean requiresRunHistory,
+                                       boolean jUnit4StyleResultCounting )
     {
         this.useFile = useFile;
         this.printSummary = printSummary;
@@ -84,6 +87,7 @@ public class StartupReportConfiguration
         this.reportNameSuffix = reportNameSuffix;
         this.configurationHash = configurationHash;
         this.requiresRunHistory = requiresRunHistory;
+        this.jUnit4StyleResultCounting = jUnit4StyleResultCounting;
         this.originalSystemOut = System.out;
         this.originalSystemErr = System.err;
     }
@@ -92,14 +96,14 @@ public class StartupReportConfiguration
     {
         File target = new File( "./target" );
         return new StartupReportConfiguration( true, true, "PLAIN", false, false, target, false, null, "TESTHASH",
-                                               false );
+                                               false, true );
     }
 
     public static StartupReportConfiguration defaultNoXml()
     {
         File target = new File( "./target" );
         return new StartupReportConfiguration( true, true, "PLAIN", false, true, target, false, null, "TESTHASHxXML",
-                                               false );
+                                               false, true );
     }
 
     public boolean isUseFile()
@@ -238,4 +242,8 @@ public class StartupReportConfiguration
         return originalSystemOut;
     }
 
+    public boolean isjUnit4StyleResultCounting()
+    {
+        return jUnit4StyleResultCounting;
+    }
 }

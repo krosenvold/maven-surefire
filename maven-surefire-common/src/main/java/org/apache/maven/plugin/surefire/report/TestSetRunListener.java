@@ -65,7 +65,7 @@ public class TestSetRunListener
                                StatelessXmlReporter simpleXMLReporter,
                                TestcycleConsoleOutputReceiver consoleOutputReceiver,
                                StatisticsReporter statisticsReporter, RunStatistics globalStats, boolean trimStackTrace,
-                               boolean isPlainFormat, boolean briefOrPlainFormat )
+                               boolean isPlainFormat, boolean briefOrPlainFormat, boolean jUnit4StyleResultCounting )
     {
         this.consoleReporter = consoleReporter;
         this.fileReporter = fileReporter;
@@ -73,7 +73,7 @@ public class TestSetRunListener
         this.simpleXMLReporter = simpleXMLReporter;
         this.consoleOutputReceiver = consoleOutputReceiver;
         this.briefOrPlainFormat = briefOrPlainFormat;
-        this.detailsForThis = new TestSetStats( trimStackTrace, isPlainFormat );
+        this.detailsForThis = new TestSetStats( trimStackTrace, isPlainFormat, jUnit4StyleResultCounting );
         this.globalStatistics = globalStats;
     }
 

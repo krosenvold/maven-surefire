@@ -54,6 +54,10 @@ Using JUnit
   Surefire supports three different generations of JUnit: JUnit 3.8.x, JUnit 4.x (serial provider) and JUnit 4.7 (junit-core provider
   with parallel support). The provider is selected based on the JUnit version in your project and the configuration parameters (for parallel).
 
+  Please note that surefire counts "Tests run" according to how the JUnit version does; JUnit4 considers any test
+  that has been attempted executed as having been "run". JUnit3/TestNG considers a test with a failure as not being run.
+  Hence the result counts will differ if you change framework.
+
 * Upgrade check for JUnit 4.x
 
   As of Surefire version 2.7, the algorithm for choosing which tests to run
