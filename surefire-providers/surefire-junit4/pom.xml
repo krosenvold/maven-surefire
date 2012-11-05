@@ -89,7 +89,7 @@
                   <shadedPattern>org.apache.maven.surefire.shade.org.apache.maven.shared</shadedPattern>
                 </relocation>
               </relocations>
-            </configuration>
+            </configuration>                          I
           </execution>
         </executions>
       </plugin>

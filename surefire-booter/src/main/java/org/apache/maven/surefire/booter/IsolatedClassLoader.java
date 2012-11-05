@@ -22,7 +22,9 @@ package org.apache.maven.surefire.booter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import org.apache.maven.surefire.testset.DirectoryScannerParameters;
 
 /**
  * @noinspection CustomClassloader
@@ -40,6 +42,8 @@ public class IsolatedClassLoader
 
     private static final URL[] EMPTY_URL_ARRAY = new URL[0];
 
+    private final Set cutToParentForThese;
+
     public IsolatedClassLoader( ClassLoader parent, boolean childDelegation, String roleName )
     {
         super( EMPTY_URL_ARRAY, parent );
@@ -47,6 +51,14 @@ public class IsolatedClassLoader
         this.childDelegation = childDelegation;
 
         this.roleName = roleName;
+
+        this.cutToParentForThese = getCutToParentForThese();
+    }
+
+    private Set getCutToParentForThese(){
+        Set classNames = new HashSet();
+        classNames.add( DirectoryScannerParameters.class.getName() );
+        return classNames;
     }
 
     public void addURL( URL url )
@@ -63,6 +75,10 @@ public class IsolatedClassLoader
         throws ClassNotFoundException
     {
         Class c;
+
+        if (cutToParentForThese.contains( name )){
+            return getParent().loadClass( name );
+        }
 
         if ( childDelegation )
         {
