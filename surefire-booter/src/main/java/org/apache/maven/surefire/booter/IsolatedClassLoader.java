@@ -24,7 +24,10 @@ import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import org.apache.maven.surefire.report.ReporterConfiguration;
 import org.apache.maven.surefire.testset.DirectoryScannerParameters;
+import org.apache.maven.surefire.testset.RunOrderParameters;
+import org.apache.maven.surefire.testset.TestArtifactInfo;
 
 /**
  * @noinspection CustomClassloader
@@ -58,6 +61,9 @@ public class IsolatedClassLoader
     private Set getCutToParentForThese(){
         Set classNames = new HashSet();
         classNames.add( DirectoryScannerParameters.class.getName() );
+        classNames.add( RunOrderParameters.class.getName() );
+        classNames.add( TestArtifactInfo.class.getName() );
+        classNames.add( ReporterConfiguration.class.getName() );
         return classNames;
     }
 

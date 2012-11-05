@@ -88,13 +88,13 @@ public class ClasspathConfiguration
     public ClassLoader createTestClassLoader( boolean childDelegation )
         throws SurefireExecutionException
     {
-        return classpathUrls.createClassLoader( null, childDelegation, enableAssertions, "test" );
+        return classpathUrls.createClassLoader( this.getClass().getClassLoader(), childDelegation, enableAssertions, "test" );
     }
 
     public ClassLoader createTestClassLoader()
         throws SurefireExecutionException
     {
-        return classpathUrls.createClassLoader( null, this.childDelegation, enableAssertions, "test" );
+        return classpathUrls.createClassLoader( this.getClass().getClassLoader(), this.childDelegation, enableAssertions, "test" );
     }
 
     public ClassLoader createSurefireClassLoader( ClassLoader parent )

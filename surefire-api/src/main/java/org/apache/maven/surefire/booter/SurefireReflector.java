@@ -183,7 +183,8 @@ public class SurefireReflector
 
     Object createRunOrderParameters( RunOrderParameters runOrderParameters )
     {
-        if ( runOrderParameters == null )
+        return runOrderParameters;
+/*        if ( runOrderParameters == null )
         {
             return null;
         }
@@ -195,28 +196,31 @@ public class SurefireReflector
                                             new Object[]{ RunOrder.asString( runOrderParameters.getRunOrder() ),
                                                 runStatisticsFile != null
                                                     ? runStatisticsFile.getAbsolutePath()
-                                                    : null } );
+                                                    : null } );*/
     }
 
     Object createTestArtifactInfo( TestArtifactInfo testArtifactInfo )
     {
-        if ( testArtifactInfo == null )
+        return testArtifactInfo;
+/*        if ( testArtifactInfo == null )
         {
             return null;
         }
         Class[] arguments = { String.class, String.class };
         Constructor constructor = ReflectionUtils.getConstructor( this.testArtifactInfo, arguments );
         return ReflectionUtils.newInstance( constructor, new Object[]{ testArtifactInfo.getVersion(),
-            testArtifactInfo.getClassifier() } );
+            testArtifactInfo.getClassifier() } );*/
     }
 
 
     Object createReporterConfiguration( ReporterConfiguration reporterConfiguration )
     {
-        Constructor constructor =
+        return reporterConfiguration;
+/*        Constructor constructor =
+
             ReflectionUtils.getConstructor( this.reporterConfiguration, new Class[]{ File.class, Boolean.class } );
         return ReflectionUtils.newInstance( constructor, new Object[]{ reporterConfiguration.getReportsDirectory(),
-            reporterConfiguration.isTrimStackTrace() } );
+            reporterConfiguration.isTrimStackTrace() } );*/
     }
 
     public Object createForkingReporterFactory( Boolean trimStackTrace, PrintStream originalSystemOut )
