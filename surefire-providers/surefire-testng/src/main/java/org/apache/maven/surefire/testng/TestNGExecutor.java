@@ -75,6 +75,8 @@ public class TestNGExecutor
         postConfigure( testng, testSourceDirectory, reportManager, suite, reportsDirectory );
         testng.setTestClasses( testClasses );
         testng.run();
+        boolean b = testng.hasFailure();
+
     }
 
     private static void applyMethodNameFiltering( TestNG testng, String methodNamePattern )

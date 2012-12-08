@@ -69,6 +69,7 @@ public class ProviderFactory
                                             ClassLoader surefireClassLoader, Object factory,
                                             ProviderConfiguration providerConfiguration, boolean insideFork,
                                             StartupConfiguration startupConfiguration1, boolean restoreStreams )
+        throws TestSetFailedException
     {
         final PrintStream orgSystemOut = System.out;
         final PrintStream orgSystemErr = System.err;
@@ -83,14 +84,6 @@ public class ProviderFactory
         try
         {
             return provider.invoke( testSet );
-        }
-        catch ( TestSetFailedException e )
-        {
-            throw new NestedRuntimeException( e );
-        }
-        catch ( ReporterException e )
-        {
-            throw new NestedRuntimeException( e );
         }
         finally
         {

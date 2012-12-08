@@ -77,6 +77,8 @@ public class ForkingRunListener
 
     public static final byte BOOTERCODE_NEXT_TEST = (byte) 'N';
 
+    public static final byte BOOTERCODE_ERROR = (byte) 'X';
+
     public static final byte BOOTERCODE_BYE = (byte) 'Z';
 
     private final PrintStream target;

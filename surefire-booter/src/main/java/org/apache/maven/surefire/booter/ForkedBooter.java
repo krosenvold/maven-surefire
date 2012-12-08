@@ -24,7 +24,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
 import org.apache.maven.surefire.suite.RunResult;
+import org.apache.maven.surefire.testset.TestSetFailedException;
 import org.apache.maven.surefire.util.LazyTestsToRun;
+import org.apache.maven.surefire.util.internal.StringUtils;
 
 /**
  * The part of the booter that is unique to a forked vm.
@@ -86,9 +88,19 @@ public class ForkedBooter
                 testSet = null;
             }
 
-            runSuitesInProcess( testSet, testClassLoader, startupConfiguration, providerConfiguration, originalOut );
+            try
+            {
+                runSuitesInProcess( testSet, testClassLoader, startupConfiguration, providerConfiguration,
+                                    originalOut );
+            }
+            catch ( Throwable t )
+            {
+                StringBuffer out = new StringBuffer(  );
+                StringUtils.escapeJavaStyleString( out, t.getMessage());
+                originalOut.println( ((char)ForkingRunListener.BOOTERCODE_ERROR) + ",0,"  + out.toString());
+            }
             // Say bye.
-            originalOut.println( "Z,0,BYE!" );
+            originalOut.println( ((char)ForkingRunListener.BOOTERCODE_BYE) + ",0,BYE!" );
             originalOut.flush();
             // noinspection CallToSystemExit
             exit( 0 );
@@ -116,7 +128,7 @@ public class ForkedBooter
                                                  StartupConfiguration startupConfiguration,
                                                  ProviderConfiguration providerConfiguration,
                                                  PrintStream originalSystemOut )
-        throws SurefireExecutionException
+        throws SurefireExecutionException, TestSetFailedException
     {
         final ClasspathConfiguration classpathConfiguration = startupConfiguration.getClasspathConfiguration();
         ClassLoader surefireClassLoader = classpathConfiguration.createSurefireClassLoader( testsClassLoader );

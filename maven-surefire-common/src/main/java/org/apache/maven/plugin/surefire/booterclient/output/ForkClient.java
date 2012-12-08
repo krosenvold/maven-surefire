@@ -38,6 +38,7 @@ import org.apache.maven.surefire.report.ConsoleOutputReceiver;
 import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.ReporterException;
 import org.apache.maven.surefire.report.RunListener;
+import org.apache.maven.surefire.report.SimpleReportEntry;
 import org.apache.maven.surefire.report.StackTraceWriter;
 import org.apache.maven.surefire.util.NestedRuntimeException;
 import org.apache.maven.surefire.util.internal.StringUtils;
@@ -61,6 +62,8 @@ public class ForkClient
     private final Properties testVmSystemProperties;
 
     private volatile boolean saidGoodBye = false;
+
+    private volatile boolean errorInFork = false;
 
     public ForkClient( DefaultReporterFactory providerReporterFactory, Properties testVmSystemProperties )
     {
@@ -150,6 +153,9 @@ public class ForkClient
                     {
                         testProvidingInputStream.provideNewTest();
                     }
+                    break;
+                case ForkingRunListener.BOOTERCODE_ERROR:
+                    errorInFork = true;
                     break;
                 case ForkingRunListener.BOOTERCODE_BYE:
                     saidGoodBye = true;
@@ -274,4 +280,8 @@ public class ForkClient
         return saidGoodBye;
     }
 
+    public boolean isErrorInFork()
+    {
+        return errorInFork;
+    }
 }

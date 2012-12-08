@@ -25,6 +25,7 @@ import org.apache.maven.surefire.booter.ProviderFactory;
 import org.apache.maven.surefire.booter.StartupConfiguration;
 import org.apache.maven.surefire.booter.SurefireExecutionException;
 import org.apache.maven.surefire.suite.RunResult;
+import org.apache.maven.surefire.testset.TestSetFailedException;
 import org.apache.maven.surefire.util.DefaultScanResult;
 
 /**
@@ -58,7 +59,7 @@ public class InPluginVMSurefireStarter
     }
 
     public RunResult runSuitesInProcess( DefaultScanResult scanResult )
-        throws SurefireExecutionException
+        throws SurefireExecutionException, TestSetFailedException
     {
         // The test classloader must be constructed first to avoid issues with commons-logging until we properly
         // separate the TestNG classloader
