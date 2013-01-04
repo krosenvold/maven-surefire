@@ -22,7 +22,9 @@ package org.apache.maven.plugin.surefire.report;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.maven.plugin.surefire.runorder.StatisticsReporter;
+import org.apache.maven.shared.utils.io.FileUtils;
 import org.apache.maven.surefire.report.ConsoleLogger;
 import org.apache.maven.surefire.report.ConsoleOutputReceiver;
 import org.apache.maven.surefire.report.ReportEntry;
@@ -42,6 +44,11 @@ public class TestSetRunListener
     private final RunStatistics globalStatistics;
 
     private final TestSetStats detailsForThis;
+
+
+    private final DeferredFileOutputStream testStdOutBuf = new DeferredFileOutputStream(100000, "surefire", "stdout" , null);
+
+    private final DeferredFileOutputStream testStdErrBuf = new DeferredFileOutputStream(100000, "surefire", "stderr" , null);
 
     private final List<ByteBuffer> testStdOut = Collections.synchronizedList( new ArrayList<ByteBuffer>() );
 
@@ -89,6 +96,7 @@ public class TestSetRunListener
         if ( stdout )
         {
             testStdOut.add( byteBuffer );
+            testStdOutBuf.write( buf, off, len );
         }
         else
         {
@@ -111,6 +119,8 @@ public class TestSetRunListener
     {
         testStdErr.clear();
         testStdOut.clear();
+        testStdOutBuf.close();
+
     }
 
     public void testSetCompleted( ReportEntry report )
