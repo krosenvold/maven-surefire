@@ -394,6 +394,7 @@ public class ForkStarter
 
         if ( forkConfiguration.isDebug() )
         {
+//            String[] environmentVariables = cli.getEnvironmentVariables();
             System.out.println( "Forking command line: " + cli );
         }
 

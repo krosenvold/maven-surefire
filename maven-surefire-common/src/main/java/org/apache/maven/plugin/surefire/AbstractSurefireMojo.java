@@ -1087,8 +1087,8 @@ public abstract class AbstractSurefireMojo
 
             final Classpath testClasspath = generateTestClasspath();
 
-            logClasspath( testClasspath, "test classpath" );
-            logClasspath( providerClasspath, "provider classpath" );
+            logClasspath( testClasspath, "test" );
+            logClasspath( providerClasspath, "provider" );
             final ClasspathConfiguration classpathConfiguration =
                 new ClasspathConfiguration( testClasspath, providerClasspath, inprocClassPath,
                                             effectiveIsEnableAssertions(), isChildDelegation() );
