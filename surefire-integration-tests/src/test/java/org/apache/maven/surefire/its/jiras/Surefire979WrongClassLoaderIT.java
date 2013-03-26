@@ -32,7 +32,7 @@ public class Surefire979WrongClassLoaderIT
         throws Exception
     {
         OutputValidator outputValidator =
-            unpack( "surefire-979-smartStackTrace-wrongClassloader" ).failNever().executeTest();
+            unpack( "surefire-979-smartStackTrace-wrongClassloader" ).maven().withFailure().executeTest();
         outputValidator.verifyTextInLog( "java.lang.NoClassDefFoundError: org/apache/commons/io/input/AutoCloseInputStream" );
     }
 

@@ -207,11 +207,13 @@ public class MavenLauncher
 
     public FailsafeOutputValidator executeVerify()
     {
+        offline();
         return new FailsafeOutputValidator( conditionalExec( "verify" ) );
     }
 
     public OutputValidator executeTest()
     {
+        offline();
         return conditionalExec( "test" );
     }
 
@@ -256,7 +258,7 @@ public class MavenLauncher
 
     public OutputValidator executeCurrentGoals()
     {
-
+        offline();
         String userLocalRepo = System.getProperty( "user.localRepository" );
         String testBuildDirectory = System.getProperty( "testBuildDirectory" );
         boolean useInterpolatedSettings = Boolean.getBoolean( "useInterpolatedSettings" );
