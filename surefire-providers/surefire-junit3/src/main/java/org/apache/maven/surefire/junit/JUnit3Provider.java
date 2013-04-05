@@ -20,6 +20,8 @@ package org.apache.maven.surefire.junit;
  */
 
 import java.util.Iterator;
+
+import org.apache.maven.surefire.booter.ForkedBooter;
 import org.apache.maven.surefire.common.junit3.JUnit3Reflector;
 import org.apache.maven.surefire.common.junit3.JUnit3TestChecker;
 import org.apache.maven.surefire.providerapi.AbstractProvider;
@@ -145,4 +147,11 @@ public class JUnit3Provider
         testsToRun = scanClassPath();
         return testsToRun.iterator();
     }
+
+    public static void main( String[] args )
+        throws Throwable
+    {
+        ForkedBooter.main( args );
+    }
+
 }

@@ -386,7 +386,9 @@ public class ForkStarter
             throw new SurefireBooterForkException( "Error creating properties files for forking", e );
         }
 
-        final Classpath bootClasspathConfiguration = forkConfiguration.getBootClasspath();
+        final Classpath bootClasspathConfiguration = startupConfiguration.isProviderMainClass() ?
+            startupConfiguration.getClasspathConfiguration().getProviderClasspath(  )  :
+            forkConfiguration.getBootClasspath();
 
         final Classpath additionlClassPathUrls =
             startupConfiguration.useSystemClassLoader() ? startupConfiguration.getClasspathConfiguration().getTestClasspath()
@@ -398,9 +400,7 @@ public class ForkStarter
 
         @SuppressWarnings( "unchecked" )
         OutputStreamFlushableCommandline cli =
-            forkConfiguration.createCommandLine( bootClasspath.getClassPath(),
-                                                 startupConfiguration.getClassLoaderConfiguration(),
-                                                 startupConfiguration.isShadefire(), forkNumber );
+            forkConfiguration.createCommandLine( bootClasspath.getClassPath(), startupConfiguration, forkNumber );
 
         final InputStreamCloser inputStreamCloser;
         final Thread inputStreamCloserHook;

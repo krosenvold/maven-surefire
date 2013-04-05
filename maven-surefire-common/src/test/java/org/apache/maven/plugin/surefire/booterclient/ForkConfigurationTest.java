@@ -40,7 +40,8 @@ public class ForkConfigurationTest
         File cpElement = getTempClasspathFile();
 
         Commandline cli =
-            config.createCommandLine( Collections.singletonList( cpElement.getAbsolutePath() ), true, false, 1 );
+            config.createCommandLine( Collections.singletonList( cpElement.getAbsolutePath() ), true, false,
+                                      null, 1 );
 
         String line = StringUtils.join( cli.getCommandline(), " " );
         assertTrue( line.contains( "-jar" ) );
@@ -55,7 +56,7 @@ public class ForkConfigurationTest
 
         final Commandline commandLine =
             forkConfiguration.createCommandLine( Collections.singletonList( cpElement.getAbsolutePath() ), false, false,
-                                                 1 );
+                                                 null, 1 );
         assertTrue( commandLine.toString().contains( "abc def" ) );
     }
 

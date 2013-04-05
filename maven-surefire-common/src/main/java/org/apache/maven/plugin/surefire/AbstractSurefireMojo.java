@@ -1937,7 +1937,7 @@ public abstract class AbstractSurefireMojo
     {
         public String getProviderName()
         {
-            return "org.apache.maven.surefire.junit.JUnit3Provider";
+            return "org.apache.maven.surefire.junit3.junit.JUnit3Provider#main";
         }
 
         public boolean isApplicable()

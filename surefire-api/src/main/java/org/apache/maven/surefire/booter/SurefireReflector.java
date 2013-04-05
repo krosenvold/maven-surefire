@@ -97,7 +97,7 @@ public class SurefireReflector
             providerPropertiesAware = surefireClassLoader.loadClass( ProviderPropertiesAware.class.getName() );
             reporterFactory = surefireClassLoader.loadClass( ReporterFactory.class.getName() );
             runResult = surefireClassLoader.loadClass( RunResult.class.getName() );
-            booterParameters = surefireClassLoader.loadClass( ProviderParameters.class.getName() );
+            booterParameters = surefireClassLoader.loadClass( "org.apache.maven.surefire.providerapi.ProviderParameters" );
         }
         catch ( ClassNotFoundException e )
         {

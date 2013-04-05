@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Class-Path: file:/Users/kristian/.m2/repository/org/apache/maven/suref
+ ire/surefire-junit3/2.15-SNAPSHOT/surefire-junit3-2.15-SNAPSHOT.jar f
+ ile:/Users/kristian/.m2/repository/org/apache/maven/surefire/common-j
+ unit3/2.15-SNAPSHOT/common-junit3-2.15-SNAPSHOT.jar file:/Users/krist
+ ian/.m2/repository/org/apache/maven/surefire/surefire-api/2.15-SNAPSH
+ OT/surefire-api-2.15-SNAPSHOT.jar file:/Users/kristian/lsrc/maven-sur
+ efire/surefire-integration-tests/src/test/resources/fork-mode/target/
+ test-classes/ file:/Users/kristian/lsrc/maven-surefire/surefire-integ
+ ration-tests/src/test/resources/fork-mode/target/classes file:/Users/
+ kristian/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar
+Main-Class: org.apache.maven.surefire.booter.ForkedBooter
+

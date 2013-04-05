@@ -47,7 +47,6 @@
       <groupId>org.apache.maven.surefire</groupId>
       <artifactId>surefire-junit3</artifactId>
       <version>${shadedVersion}</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.surefire</groupId>

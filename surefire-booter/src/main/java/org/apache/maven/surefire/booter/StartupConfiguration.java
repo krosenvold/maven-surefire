@@ -19,6 +19,8 @@ package org.apache.maven.surefire.booter;
  * under the License.
  */
 
+
+
 /**
  * Configuration that is used by the SurefireStarter but does not make it into the provider itself.
  *
@@ -43,11 +45,16 @@ public class StartupConfiguration
                                  ClassLoaderConfiguration classLoaderConfiguration, boolean isForkRequested,
                                  boolean inForkedVm )
     {
-        this.providerClassName = providerClassName;
         this.classpathConfiguration = classpathConfiguration;
         this.classLoaderConfiguration = classLoaderConfiguration;
         this.isForkRequested = isForkRequested;
+        this.providerClassName = providerClassName;
         isInForkedVm = inForkedVm;
+    }
+
+    public boolean isProviderMainClass()
+    {
+        return providerClassName.endsWith( "#main" );
     }
 
     public static StartupConfiguration inForkedVm( String providerClassName,
@@ -77,6 +84,48 @@ public class StartupConfiguration
     public String getProviderClassName()
     {
         return providerClassName;
+    }
+
+    public String getActualClassName()
+    {
+        if (isProviderMainClass( ))
+            return stripEnd( providerClassName, "#main" );
+        return providerClassName;
+    }
+
+    /**
+     * <p>Strip any of a supplied String from the end of a String.</p>
+     * <p/>
+     * <p>If the strip String is <code>null</code>, whitespace is
+     * stripped.</p>
+     *
+     * @param str   the String to remove characters from
+     * @param strip the String to remove
+     * @return the stripped String
+     */
+    public static String stripEnd( String str, String strip )
+    {
+        if ( str == null )
+        {
+            return null;
+        }
+        int end = str.length();
+
+        if ( strip == null )
+        {
+            while ( ( end != 0 ) && Character.isWhitespace( str.charAt( end - 1 ) ) )
+            {
+                end--;
+            }
+        }
+        else
+        {
+            while ( ( end != 0 ) && ( strip.indexOf( str.charAt( end - 1 ) ) != -1 ) )
+            {
+                end--;
+            }
+        }
+        return str.substring( 0, end );
     }
 
     public ClassLoaderConfiguration getClassLoaderConfiguration()
