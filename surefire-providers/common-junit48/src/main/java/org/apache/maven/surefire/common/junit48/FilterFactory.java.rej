@@ -1,0 +1,43 @@
+***************
+*** 206,222 ****
+          {
+              return shouldRun( description, ( description.getMethodName() == null
+                  ? null
+-                 : Description.createSuiteDescription( description.getTestClass() ) ) );
+          }
+  
+          private boolean shouldRun( Description description, Description parent )
+          {
+              Boolean result = shouldRunAnswers.get( description );
+              if ( result != null )
+              {
+                  return result;
+              }
+  
+              if ( matcher == null )
+              {
+                  return true;
+--- 206,228 ----
+          {
+              return shouldRun( description, ( description.getMethodName() == null
+                  ? null
++                 : Description.createSuiteDescription( description.getTestClass().getSuperclass() ) ) );
+          }
+  
+          private boolean shouldRun( Description description, Description parent )
+          {
+              Boolean result = shouldRunAnswers.get( description );
++             Boolean parentResult = shouldRunAnswers.get( parent );
++             
+              if ( result != null )
+              {
+                  return result;
+              }
+  
++             if ( parentResult != null )
++             {
++                 return parentResult;
++             }
+              if ( matcher == null )
+              {
+                  return true;
