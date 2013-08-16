@@ -19,6 +19,7 @@ package org.apache.maven.plugin.surefire.report;
  * under the License.
  */
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilterOutputStream;
@@ -96,7 +97,7 @@ public class StatelessXmlReporter
         throws ReporterException
     {
 
-        FileOutputStream outputStream = getOutputStream( testSetReportEntry );
+        OutputStream outputStream = getOutputStream( testSetReportEntry );
         OutputStreamWriter fw = getWriter( outputStream );
         try
         {
@@ -131,12 +132,12 @@ public class StatelessXmlReporter
         }
     }
 
-    private OutputStreamWriter getWriter( FileOutputStream fos )
+    private OutputStreamWriter getWriter( OutputStream fos )
     {
         return new OutputStreamWriter( fos, ENCODING_CS );
     }
 
-    private FileOutputStream getOutputStream( WrappedReportEntry testSetReportEntry )
+    private OutputStream getOutputStream( WrappedReportEntry testSetReportEntry )
     {
         File reportFile = getReportFile( testSetReportEntry, reportsDirectory, reportNameSuffix );
 
@@ -148,7 +149,8 @@ public class StatelessXmlReporter
         try
         {
 
-            return new FileOutputStream( reportFile );
+            FileOutputStream fileOutputStream = new FileOutputStream( reportFile );
+            return new BufferedOutputStream( fileOutputStream, 32768 );
         }
         catch ( Exception e )
         {
@@ -221,7 +223,7 @@ public class StatelessXmlReporter
 
 
     private void getTestProblems( OutputStreamWriter outputStreamWriter, XMLWriter ppw, WrappedReportEntry report,
-                                  boolean trimStackTrace, String reportNameSuffix, FileOutputStream fw )
+                                  boolean trimStackTrace, String reportNameSuffix, OutputStream outputStream )
     {
 
         startTestElement( ppw, report, reportNameSuffix );
@@ -261,17 +263,16 @@ public class StatelessXmlReporter
 
         ppw.endElement(); // entry type
 
-        EncodingOutputStream eos = new EncodingOutputStream( fw );
+        EncodingOutputStream eos = new EncodingOutputStream( outputStream );
 
-        addOutputStreamElement( outputStreamWriter, fw, eos, ppw, report.getStdout(), "system-out" );
+        addOutputStreamElement( outputStreamWriter, eos, ppw, report.getStdout(), "system-out" );
 
-        addOutputStreamElement( outputStreamWriter, fw, eos, ppw, report.getStdErr(), "system-err" );
+        addOutputStreamElement( outputStreamWriter, eos, ppw, report.getStdErr(), "system-err" );
 
         ppw.endElement(); // test element
     }
 
-    private void addOutputStreamElement( OutputStreamWriter outputStreamWriter, OutputStream fw,
-                                         EncodingOutputStream eos, XMLWriter xmlWriter,
+    private void addOutputStreamElement( OutputStreamWriter outputStreamWriter, EncodingOutputStream eos, XMLWriter xmlWriter,
                                          Utf8RecodingDeferredFileOutputStream utf8RecodingDeferredFileOutputStream,
                                          String name )
     {
@@ -426,7 +427,7 @@ public class StatelessXmlReporter
 
     private static boolean isIllegalEscape( int c )
     {
-        return c >= 0 && c < 32 && c != '\n' && c != '\r' && c != '\t';
+        return c < 32 && c != '\n' && c != '\r' && c != '\t' && c >= 0;
     }
 
     private static String escapeXml( String text, boolean attribute )
