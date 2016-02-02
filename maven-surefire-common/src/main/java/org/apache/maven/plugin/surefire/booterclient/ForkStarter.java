@@ -50,9 +50,13 @@ import org.apache.maven.surefire.suite.RunResult;
 import org.apache.maven.surefire.testset.TestRequest;
 import org.apache.maven.surefire.util.DefaultScanResult;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -152,9 +156,7 @@ public class ForkStarter
         implements Runnable, Closeable
     {
         private final List<AtomicReference<Closeable>> testProvidingInputStream;
-
         private final Thread inputStreamCloserHook;
-
         public CloseableCloser( Closeable... testProvidingInputStream )
         {
 
@@ -500,6 +502,76 @@ public class ForkStarter
         }
     }
 
+    /**
+     * Polls an external file, looking for surefire commands from the fork
+     */
+    class FileBasedStreamConsumer
+        implements Runnable, Closeable
+    {
+        private final File file;
+
+        private final ForkClient forkClient;
+
+        private final boolean deleteOnExit;
+
+        private final BufferedReader reader;
+
+        private volatile boolean running = true;
+
+        public FileBasedStreamConsumer( File file, ForkClient forkClient, boolean deleteOnExit )
+            throws FileNotFoundException, UnsupportedEncodingException
+        {
+            this.file = file;
+            this.forkClient = forkClient;
+            this.deleteOnExit = deleteOnExit;
+            this.reader = new BufferedReader( new FileReader( file ) );
+        }
+
+        public void close()
+            throws IOException
+        {
+            running = false;
+            if ( deleteOnExit )
+            {
+                file.delete();
+            }
+        }
+
+        public void run()
+        {
+            while ( running )
+            {
+                try
+                {
+                    String s1 = reader.readLine();
+                    if ( s1 != null )
+                    {
+                        forkClient.consumeLine( s1 );
+                    }
+                    else
+                    {
+                        Thread.sleep( 10 );
+                    }
+                }
+                catch ( IOException e )
+                {
+                    if ( log.isDebugEnabled() )
+                    {
+                        log.debug( "Command channel listener got IO exception, we're out of here !" );
+                        running = false;
+                    }
+                }
+                catch ( InterruptedException ignore )
+                {
+                    // should mean something. Maybe someone wants us to stop, some time in the future
+                }
+
+            }
+
+
+        }
+    }
+
     private RunResult fork( Object testSet, KeyValueSource providerProperties, ForkClient forkClient,
                             SurefireProperties effectiveSystemProperties, int forkNumber,
                             AbstractForkInputStream testProvidingInputStream, boolean readTestsFromInStream )
@@ -564,6 +636,21 @@ public class ForkStarter
         }
 
         ThreadedStreamConsumer threadedStreamConsumer = new ThreadedStreamConsumer( forkClient );
+        FileBasedStreamConsumer fileBasedStreamConsumer;
+        try
+        {
+            File commandChannel = File.createTempFile( "command-channel", "surefire" );
+            fileBasedStreamConsumer =
+                new FileBasedStreamConsumer( commandChannel, forkClient, !forkConfiguration.isDebug() );
+            new Thread( fileBasedStreamConsumer, "surefire command channel listener" ).start();
+            cli.createArg()
+               .setFile( commandChannel );
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
+
         final CloseableCloser closer = new CloseableCloser( threadedStreamConsumer, testProvidingInputStream );
 
         if ( forkConfiguration.isDebug() )

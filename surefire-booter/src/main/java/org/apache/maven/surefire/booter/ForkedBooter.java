@@ -45,6 +45,8 @@ import static org.apache.maven.surefire.booter.ForkingRunListener.BOOTERCODE_ERR
 import static org.apache.maven.surefire.booter.ForkingRunListener.encode;
 import static org.apache.maven.surefire.util.ReflectionUtils.instantiateOneArg;
 import static org.apache.maven.surefire.util.internal.DaemonThreadFactory.newDaemonThreadFactory;
+import java.io.FileOutputStream;
+
 import static org.apache.maven.surefire.util.internal.StringUtils.encodeStringForForkCommunication;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -73,11 +75,24 @@ public final class ForkedBooter
      */
     public static void main( String... args )
     {
+
         final CommandReader reader = startupMasterProcessReader();
         final ScheduledFuture<?> pingScheduler = listenToShutdownCommands( reader );
-        final PrintStream originalOut = System.out;
         try
         {
+            String commandChannelArg = findCommandChannelArg( args );
+            final PrintStream originalOut;
+            if ( commandChannelArg != null )
+            {
+                // use a file since the caller requested it.
+                String arg = args[2];
+                originalOut = new PrintStream( new FileOutputStream( new File( arg ) ) );
+            }
+            else
+            {
+                originalOut = System.out;
+            }
+
             if ( args.length > 1 )
             {
                 SystemPropertyManager.setSystemProperties( new File( args[1] ) );
@@ -204,6 +219,18 @@ public final class ForkedBooter
                 }
             }
         };
+    }
+
+    private static String findCommandChannelArg( String[] args )
+    {
+        for ( String arg : args )
+        {
+            if ( arg.startsWith( "command-channel" ) )
+            {
+                return arg;
+            }
+        }
+        return null;
     }
 
     private static void encodeAndWriteToOutput( String string, PrintStream out )
