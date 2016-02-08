@@ -639,7 +639,7 @@ public class ForkStarter
         FileBasedStreamConsumer fileBasedStreamConsumer;
         try
         {
-            File commandChannel = File.createTempFile( "command-channel", "surefire" );
+            File commandChannel = File.createTempFile( "command-channel-", "surefire" );
             fileBasedStreamConsumer =
                 new FileBasedStreamConsumer( commandChannel, forkClient, !forkConfiguration.isDebug() );
             new Thread( fileBasedStreamConsumer, "surefire command channel listener" ).start();

@@ -225,7 +225,7 @@ public final class ForkedBooter
     {
         for ( String arg : args )
         {
-            if ( arg.startsWith( "command-channel" ) )
+            if ( arg.contains( "command-channel" ) )
             {
                 return arg;
             }
